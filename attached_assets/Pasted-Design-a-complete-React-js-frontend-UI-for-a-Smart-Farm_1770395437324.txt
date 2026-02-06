@@ -1,0 +1,111 @@
+Design a complete React.js frontend UI for a “Smart Farming AI Project”.
+This is only the UI layer — no backend, no ML integration, and no auto-detection of location or weather.
+All inputs are manual.
+
+Tech stack:
+* React.js
+* React Router
+* Plain CSS or Tailwind CSS
+* Functional components with hooks
+
+General UI rules:
+* Farmer-friendly design
+* Simple forms, large buttons, clear labels
+* Green / agriculture-themed color palette
+* Responsive layout (desktop + mobile)
+* Clean component-based structure
+
+Pages & Requirements:
+
+1. Login Page (/login)
+* Split layout
+* Left: App name, logo placeholder, short tagline
+* Right: Login form with
+  - Email or Mobile Number
+  - Password
+  - Login button
+  - “Login as Guest” button
+  - Link to Register page
+* Basic form validation (empty field check)
+
+2. Register Page (/register)
+* Fields:
+  - Name
+  - Email or Mobile
+  - Password
+  - Confirm Password
+* Register button
+* Link back to Login page
+
+3. Dashboard (/dashboard)
+* After login, redirect here
+* Display 3 clickable cards:
+  - Soil Analysis & Irrigation
+  - Plant Disease Detection
+  - Market Prices
+* Each card navigates to its respective page
+* Simple welcome message
+
+4. Soil Analysis + Crop + Irrigation Page (/soil-analysis)
+This is the main page.
+
+Layout: 3-column layout (or stacked on mobile)
+
+Left column: Input Form
+* Upload soil image
+* N value (number, optional)
+* P value (number, optional)
+* K value (number, optional)
+* pH value (optional)
+* Location (manual text input)
+* Time of the year
+* “Analyze Soil” button
+
+Middle column: Soil Analysis Result (shown after submit)
+* Soil type
+* Fertility level
+* Soil condition summary
+
+Right column: Recommendations (shown after submit)
+* Crop recommendations (top 3–5 with suitability score)
+* Irrigation recommendation:
+  - Irrigation type
+  - Water requirement (low/medium/high)
+  - Irrigation frequency
+
+Use dummy/static data to display results after clicking “Analyze Soil”.
+
+5. Plant Disease Detection Page (/disease-detection)
+* Upload plant/leaf image
+* Crop name dropdown
+* “Detect Disease” button
+* Display dummy output:
+  - Disease name
+  - Severity
+  - Suggested treatment
+
+6. Market Prices Page (/market-prices)
+* Crop name input
+* Market location input (manual)
+* “Get Prices” button
+* Display dummy price table
+
+Navigation:
+* Use a Navbar + Sidebar for logged-in pages
+* Navbar includes app name and Logout button
+* Sidebar includes links to:
+  - Dashboard
+  - Soil Analysis
+  - Disease Detection
+  - Market Prices
+
+Code structure:
+* Separate components and pages
+* Use React Router for navigation
+* Clean folder structure (pages, components)
+* No authentication logic required — simulate login state
+
+Output:
+* Provide complete React component code
+* Include basic styling
+* App should run without errors
