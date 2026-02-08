@@ -13,10 +13,11 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true });
 
 export const soilAnalysis = pgTable("soil_analysis", {
   id: serial("id").primaryKey(),
-  nValue: integer("n_value"),
-  pValue: integer("p_value"),
-  kValue: integer("k_value"),
-  phValue: text("ph_value"),
+
+  nValue: integer("n_value").notNull(),
+  pValue: integer("p_value").notNull(),
+  kValue: integer("k_value").notNull(),
+  phValue: integer("ph_value"),
   location: text("location").notNull(),
   timeOfYear: text("time_of_year"),
 });
