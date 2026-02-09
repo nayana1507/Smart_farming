@@ -8,14 +8,22 @@ export function useMarketPrices(crop?: string, location?: string) {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Mock data generator based on filters
-      const basePrice = crop === 'Wheat' ? 240 : crop === 'Corn' ? 180 : 200;
+      // Mock data generator based on filters with INR prices per quintal
+      const basePrice = crop === 'Wheat' ? 19000 : 
+                       crop === 'Corn' ? 14500 : 
+                       crop === 'Rice' ? 21000 : 
+                       crop === 'Soybeans' ? 38000 : 
+                       17000;
       
       return [
-        { market: "Central Market", price: basePrice + Math.random() * 20, trend: "up" },
-        { market: "North District", price: basePrice - Math.random() * 15, trend: "down" },
-        { market: "Export Hub", price: basePrice + Math.random() * 40, trend: "stable" },
-        { market: "Local Co-op", price: basePrice, trend: "up" },
+        { market: "Azadpur Mandi, Delhi", price: basePrice + Math.random() * 1500, trend: "up" },
+        { market: "APMC Vashi, Mumbai", price: basePrice - Math.random() * 1200, trend: "down" },
+        { market: "Koyambedu Market, Chennai", price: basePrice + Math.random() * 2000, trend: "stable" },
+        { market: "Bangalore APMC", price: basePrice + Math.random() * 800, trend: "up" },
+        { market: "Ludhiana Grain Mandi", price: basePrice - Math.random() * 500, trend: "stable" },
+        { market: "Pune APMC", price: basePrice + Math.random() * 1000, trend: "up" },
+        { market: "Kolkata Posta Bazar", price: basePrice - Math.random() * 900, trend: "down" },
+        { market: "Hyderabad Grain Market", price: basePrice + Math.random() * 600, trend: "stable" },
       ];
     },
   });
