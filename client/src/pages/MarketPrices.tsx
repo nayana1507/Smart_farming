@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Layout } from "@/components/Layout";
 import { useState } from "react";
 import { useMarketPrices } from "@/hooks/use-market";
@@ -14,15 +15,15 @@ export default function MarketPrices() {
   
   const { data: prices, isLoading, refetch } = useMarketPrices(selectedCrop, selectedLocation);
 
-  // Mock historical data for the chart
+  // Mock historical data for the chart (in INR per quintal)
   const historicalData = [
-    { day: 'Mon', price: 210 },
-    { day: 'Tue', price: 215 },
-    { day: 'Wed', price: 212 },
-    { day: 'Thu', price: 218 },
-    { day: 'Fri', price: 225 },
-    { day: 'Sat', price: 222 },
-    { day: 'Sun', price: 230 },
+    { day: 'Mon', price: 17500 },
+    { day: 'Tue', price: 17900 },
+    { day: 'Wed', price: 17650 },
+    { day: 'Thu', price: 18100 },
+    { day: 'Fri', price: 18750 },
+    { day: 'Sat', price: 18500 },
+    { day: 'Sun', price: 19100 },
   ];
 
   return (
@@ -70,10 +71,11 @@ export default function MarketPrices() {
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#6b7280'}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280'}} domain={['dataMin - 10', 'dataMax + 10']} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280'}} domain={['dataMin - 500', 'dataMax + 500']} />
                   <CartesianGrid vertical={false} stroke="#f3f4f6" />
                   <Tooltip 
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                    formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, 'Price']}
                   />
                   <Area type="monotone" dataKey="price" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorPrice)" />
                 </AreaChart>
@@ -85,8 +87,8 @@ export default function MarketPrices() {
           <Card className="bg-primary text-white border-none shadow-xl shadow-primary/20 flex flex-col justify-center">
             <CardContent className="p-8 text-center space-y-2">
               <p className="text-emerald-100 text-lg font-medium">Average Price</p>
-              <h2 className="text-5xl font-display font-bold">$224.50</h2>
-              <p className="text-emerald-100 text-sm">Per Metric Ton</p>
+              <h2 className="text-5xl font-display font-bold">₹18,750</h2>
+              <p className="text-emerald-100 text-sm">Per Quintal</p>
               <div className="pt-6">
                 <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 text-white text-sm font-bold backdrop-blur-sm">
                   <TrendingUp className="w-4 h-4 mr-2" /> +4.2% This Week
@@ -111,7 +113,7 @@ export default function MarketPrices() {
                 <TableHeader>
                   <TableRow className="hover:bg-transparent bg-gray-50/50">
                     <TableHead className="w-[300px]">Market Location</TableHead>
-                    <TableHead className="text-right">Price / Ton</TableHead>
+                    <TableHead className="text-right">Price / Quintal</TableHead>
                     <TableHead className="text-right">Trend</TableHead>
                     <TableHead className="text-right">Status</TableHead>
                   </TableRow>
@@ -120,7 +122,7 @@ export default function MarketPrices() {
                   {prices?.map((item, i) => (
                     <TableRow key={i} className="hover:bg-gray-50">
                       <TableCell className="font-medium">{item.market}</TableCell>
-                      <TableCell className="text-right font-bold text-gray-900">${item.price.toFixed(2)}</TableCell>
+                      <TableCell className="text-right font-bold text-gray-900">₹{item.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           {item.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-500" />}
