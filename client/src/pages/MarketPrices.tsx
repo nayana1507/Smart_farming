@@ -27,7 +27,7 @@ import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function MarketPrices() {
-  const { data: prices = [], isLoading, refetch } = useMarketPrices();
+  const { data: prices = [], isLoading, refetch, dataUpdatedAt } = useMarketPrices();
 
   const [selectedCrop, setSelectedCrop] = useState<string>("");
 
@@ -126,6 +126,10 @@ export default function MarketPrices() {
             <p className="text-sm text-muted-foreground">
               Per Quintal
             </p>
+            <p className="text-sm text-muted-foreground text-center">
+  Last updated: {new Date(dataUpdatedAt).toLocaleTimeString()}
+</p>
+
           </CardContent>
         </Card>
 
