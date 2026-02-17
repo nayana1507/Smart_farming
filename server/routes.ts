@@ -3,6 +3,7 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { fetchMarketPrices } from "./agmarknet";
+import weatherRoutes from "./routes/weather";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -10,10 +11,15 @@ export async function registerRoutes(
 ): Promise<Server> {
 
   // ===============================
+  // WEATHER ROUTE
+  // ===============================
+  app.use("/api/weather", weatherRoutes);
+
+
+  // ===============================
   // AUTH ROUTES
   // ===============================
 
-  // LOGIN
   app.post(api.auth.login.path, async (req, res) => {
     try {
       const { username, password } = api.auth.login.input.parse(req.body);
@@ -35,7 +41,6 @@ export async function registerRoutes(
   });
 
 
-  // REGISTER
   app.post(api.auth.register.path, async (req, res) => {
     try {
       const input = api.auth.register.input.parse(req.body);
@@ -101,21 +106,17 @@ export async function registerRoutes(
 
 
   // ===============================
-  // MARKET PRICES (Temporary Mock)
+  // MARKET PRICES (Live)
   // ===============================
 
-  // Market Prices - Live Agmarknet Data
-
-app.get("/api/market/prices", async (req, res) => {
-  try {
-    const data = await fetchMarketPrices();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch market prices" });
-  }
-});
-
-
+  app.get("/api/market/prices", async (_req, res) => {
+    try {
+      const data = await fetchMarketPrices();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch market prices" });
+    }
+  });
 
 
   // ===============================

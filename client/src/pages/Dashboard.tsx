@@ -4,9 +4,39 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight, Droplets, ScanEye, TrendingUp, Sun, CloudRain, Wind } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useEffect, useState } from "react";
+import { useWeather } from "@/hooks/use-weather";
 
 export default function Dashboard() {
   const { user } = useAuth();
+
+  // 🌍 Get user location
+  const [coords, setCoords] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoords({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        });
+      },
+      () => {
+        console.log("Location permission denied. Using default location.");
+      }
+    );
+  }, []);
+
+  // 🌤 Fetch weather
+  const { data: weather, isLoading } = useWeather(
+    coords?.lat,
+    coords?.lon
+  );
 
   const features = [
     {
@@ -41,24 +71,50 @@ export default function Dashboard() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-display font-bold text-gray-900">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Good morning, {user?.name || "Farmer"}. Here's what's happening today.</p>
+            <p className="text-muted-foreground mt-1">
+              Good morning, {user?.name || "Farmer"}. Here's what's happening today.
+            </p>
           </div>
-          <div className="flex items-center gap-3 bg-white p-2 pr-4 rounded-xl shadow-sm border border-border">
+
+          {/* 🌤 LIVE WEATHER SECTION */}
+          <div className="flex items-center gap-3 bg-white p-3 pr-5 rounded-xl shadow-sm border border-border min-w-[240px]">
             <div className="p-2 bg-yellow-100 text-yellow-600 rounded-lg">
               <Sun className="w-5 h-5" />
             </div>
-            <div>
-              <p className="text-sm font-semibold">24°C</p>
-              <p className="text-xs text-muted-foreground">Sunny</p>
-            </div>
-            <div className="h-8 w-px bg-border mx-2"></div>
+
+            {isLoading ? (
+              <div>
+                <p className="text-sm font-semibold">Loading...</p>
+                <p className="text-xs text-muted-foreground">Fetching weather</p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-sm font-semibold">
+                  {weather?.temperature ?? "--"}°C
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {weather?.condition ?? "Weather"} • {weather?.city ?? "Your Area"}
+                </p>
+              </div>
+            )}
+
+            <div className="h-8 w-px bg-border mx-3"></div>
+
             <div className="flex gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><CloudRain className="w-3 h-3" /> 12%</span>
-              <span className="flex items-center gap-1"><Wind className="w-3 h-3" /> 8km/h</span>
+              <span className="flex items-center gap-1">
+                <CloudRain className="w-3 h-3" />
+                {weather?.rainfall ?? 0}%
+              </span>
+
+              <span className="flex items-center gap-1">
+                <Wind className="w-3 h-3" />
+                {weather?.windspeed ?? "--"} km/h
+              </span>
             </div>
           </div>
         </header>
 
+        {/* Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map((feature, i) => (
             <Link key={i} href={feature.href}>
@@ -71,11 +127,16 @@ export default function Dashboard() {
                   </div>
                   <CardTitle className="text-xl">{feature.title}</CardTitle>
                 </CardHeader>
+
                 <CardContent className="relative">
                   <CardDescription className="text-base mb-6">
                     {feature.description}
                   </CardDescription>
-                  <Button variant="ghost" className="p-0 h-auto font-semibold text-primary hover:text-primary/80 hover:bg-transparent flex items-center gap-2 group-hover:gap-3 transition-all">
+
+                  <Button
+                    variant="ghost"
+                    className="p-0 h-auto font-semibold text-primary hover:text-primary/80 hover:bg-transparent flex items-center gap-2 group-hover:gap-3 transition-all"
+                  >
                     Access Tool <ArrowRight className="w-4 h-4" />
                   </Button>
                 </CardContent>

@@ -12,7 +12,7 @@ export function useMarketPrices() {
   return useQuery({
     queryKey: ["market-prices"],
     queryFn: async () => {
-      console.log("Fetching market prices..."); // 👈 ADD THIS
+      console.log("Fetching market prices..."); 
 
       const res = await fetch("/api/market/prices");
 
