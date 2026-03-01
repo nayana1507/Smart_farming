@@ -2,53 +2,65 @@ import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
-import { z } from "zod";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // Auth Routes
+
+  /* ================= AUTH ROUTES ================= */
+
+  // LOGIN
   app.post(api.auth.login.path, async (req, res) => {
     try {
-      const { username, password } = api.auth.login.input.parse(req.body);
-      const user = await storage.getUserByUsername(username);
-      
-      // Simple password check (plaintext for demo as requested)
+      // Now using email instead of username
+      const { email, password } = api.auth.login.input.parse(req.body);
+
+      // storage internally uses email as username
+      const user = await storage.getUserByUsername(email);
+
+      // Simple plaintext password check (as your demo currently does)
       if (!user || user.password !== password) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
-      
-      res.json({ id: user.id, email: user.email, name: user.name || "User" });
+
+      res.json({
+        id: user.id,
+        email: user.email,
+        name: user.name || "User",
+      });
+
     } catch (error) {
-       res.status(400).json({ message: "Invalid input" });
+      res.status(400).json({ message: "Invalid input" });
     }
   });
 
+  // REGISTER
   app.post(api.auth.register.path, async (req, res) => {
     try {
       const input = api.auth.register.input.parse(req.body);
-      // Check if user exists
+
       const existing = await storage.getUserByUsername(input.email);
       if (existing) {
         return res.status(400).json({ message: "User already exists" });
       }
-      
+
       const user = await storage.createUser(input);
-      res.status(201).json({ id: user.id, email: user.email, name: user.name || "" });
+
+      res.status(201).json({
+        id: user.id,
+        email: user.email,
+        name: user.name || "",
+      });
+
     } catch (error) {
       res.status(400).json({ message: "Registration failed" });
     }
   });
 
-  // Soil Analysis - Mock Response
-  app.post(api.soil.analyze.path, (req, res) => {
-    try {
-        api.soil.analyze.input.parse(req.body);
-    } catch (e) {
-        // ignore validation for demo
-    }
+  /* ================= SOIL ANALYSIS (MOCK) ================= */
 
+  app.post(api.soil.analyze.path, (req, res) => {
     res.json({
       soilType: "Loamy Soil",
       fertility: "High",
@@ -66,16 +78,19 @@ export async function registerRoutes(
     });
   });
 
-  // Disease Detection - Mock Response
+  /* ================= DISEASE DETECTION (MOCK) ================= */
+
   app.post(api.disease.detect.path, (req, res) => {
     res.json({
       disease: "Late Blight",
       severity: "High",
-      treatment: "Apply copper-based fungicides. Remove infected leaves immediately to prevent spread."
+      treatment:
+        "Apply copper-based fungicides. Remove infected leaves immediately to prevent spread."
     });
   });
 
-  // Market Prices - Mock Response
+  /* ================= MARKET PRICES (MOCK) ================= */
+
   app.get(api.market.prices.path, (req, res) => {
     res.json([
       { market: "Central Market", price: 1200, trend: "up" },
@@ -84,7 +99,8 @@ export async function registerRoutes(
     ]);
   });
 
-  // Seeding
+  /* ================= SEED USER ================= */
+
   if (await storage.getUserByUsername("farmer@example.com") === undefined) {
     await storage.createUser({
       email: "farmer@example.com",
@@ -92,6 +108,15 @@ export async function registerRoutes(
       name: "John Doe"
     });
     console.log("Seeded default user: farmer@example.com / password123");
+  } 
+  // Seed guest user
+  if (await storage.getUserByUsername("guest@demo.com") === undefined) {
+    await storage.createUser({
+      email: "guest@demo.com",
+      password: "password",
+      name: "Guest User"
+    });
+  console.log("Seeded guest user: guest@demo.com / password");
   }
 
   return httpServer;
