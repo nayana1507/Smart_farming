@@ -2,7 +2,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/use-auth";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sprout, ArrowRight, Loader2 } from "lucide-react";
@@ -33,18 +40,19 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-white">
-      
-      {/* Left Side - Branding */}
+      {/* Left Side */}
       <div className="hidden lg:flex w-1/2 bg-primary relative overflow-hidden items-center justify-center p-12 text-white">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1625246333195-551e5051d939?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
-        
+
         <div className="relative z-10 max-w-lg">
           <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-8 border border-white/20">
             <Sprout className="w-8 h-8 text-white" />
           </div>
+
           <h1 className="text-5xl font-display font-bold mb-6">
             Farming made smarter.
           </h1>
+
           <p className="text-lg text-emerald-100 leading-relaxed">
             Access advanced soil analysis, real-time disease detection,
             and live market prices to maximize your yield and profits.
@@ -52,10 +60,9 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right Side - Login Form */}
+      {/* Right Side */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-gray-50/50">
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-3xl shadow-xl shadow-black/5 border border-gray-100">
-          
           <div className="text-center">
             <h2 className="text-3xl font-display font-bold text-gray-900">
               Welcome Back
@@ -67,7 +74,6 @@ export default function Login() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              
               {/* Email */}
               <FormField
                 control={form.control}
@@ -107,7 +113,6 @@ export default function Login() {
                 )}
               />
 
-              {/* Submit Button */}
               <Button
                 type="submit"
                 className="w-full h-12 text-base rounded-xl bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-200"
@@ -138,20 +143,18 @@ export default function Login() {
           </div>
 
           {/* Guest Login */}
-          <div className="grid gap-4">
-            <Button
-              variant="outline"
-              className="h-12 rounded-xl border-gray-200 hover:bg-gray-50"
-              onClick={() =>
-                login.mutate({
-                  email: "guest@demo.com",
-                  password: "password",
-                })
-              }
-            >
-              Continue as Guest
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            className="h-12 rounded-xl border-gray-200 hover:bg-gray-50"
+            onClick={() =>
+              login.mutate({
+                email: "guest@demo.com",
+                password: "password",
+              })
+            }
+          >
+            Continue as Guest
+          </Button>
 
           {/* Register Link */}
           <p className="text-center text-sm text-gray-500">
@@ -163,7 +166,6 @@ export default function Login() {
               Create an account
             </Link>
           </p>
-
         </div>
       </div>
     </div>
