@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { fetchMarketPrices } from "./agmarknet";
 import weatherRoutes from "./routes/weather";
+import soilCropRoutes from "./routes/soilCrop.routes";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -14,6 +15,7 @@ export async function registerRoutes(
   // WEATHER ROUTE
   // ===============================
   app.use("/api/weather", weatherRoutes);
+
 
   // ===============================
   // AUTH ROUTES
@@ -35,7 +37,7 @@ export async function registerRoutes(
         name: user.name ?? "User",
       });
 
-    } catch (error) {
+    } catch {
       return res.status(400).json({ message: "Invalid input" });
     }
   });
@@ -61,15 +63,17 @@ export async function registerRoutes(
         name: user.name ?? "",
       });
 
-    } catch (error) {
+    } catch {
       return res.status(400).json({ message: "Registration failed" });
     }
   });
 
+
   // ===============================
   // SOIL ANALYSIS (Mock)
   // ===============================
-  app.post(api.soil.analyze.path, (_req, res) => {
+
+  app.post(api.soil.analyze.path, (req, res) => {
     return res.json({
       soilType: "Loamy Soil",
       fertility: "High",
@@ -87,6 +91,7 @@ export async function registerRoutes(
     });
   });
 
+
   // ===============================
   // DISEASE DETECTION (Mock)
   // ===============================
@@ -100,19 +105,20 @@ export async function registerRoutes(
   });
 
   // ===============================
-  // MARKET PRICES (Live)
+  // MARKET PRICES
   // ===============================
   app.get("/api/market/prices", async (_req, res) => {
     try {
       const data = await fetchMarketPrices();
-      return res.json(data);
+      res.json(data);
     } catch (error) {
-      return res.status(500).json({ message: "Failed to fetch market prices" });
+      res.status(500).json({ message: "Failed to fetch market prices" });
     }
   });
 
+
   // ===============================
-  // SEED DEFAULT USERS
+  // SEED DEFAULT USER
   // ===============================
 
   const existingSeedUser = await storage.getUserByUsername("farmer@example.com");
@@ -125,18 +131,6 @@ export async function registerRoutes(
     });
 
     console.log("Seeded default user: farmer@example.com / password123");
-  }
-
-  const existingGuest = await storage.getUserByUsername("guest@demo.com");
-
-  if (!existingGuest) {
-    await storage.createUser({
-      email: "guest@demo.com",
-      password: "password",
-      name: "Guest User",
-    });
-
-    console.log("Seeded guest user: guest@demo.com / password");
   }
 
   return httpServer;

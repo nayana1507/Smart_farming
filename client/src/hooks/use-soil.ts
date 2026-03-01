@@ -1,46 +1,66 @@
 import { useMutation } from "@tanstack/react-query";
-import { api } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
-import type { InsertSoilAnalysis } from "@shared/schema";
 
 export function useSoilAnalysis() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: InsertSoilAnalysis) => {
-      // Simulate API call to /api/soil/analyze
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Return mock response structure defined in shared/routes.ts
-      return {
-        soilType: "Loamy Sand",
-        fertility: "Moderate",
-        condition: "Healthy but needs nitrogen",
-        crops: [
-          { name: "Wheat", score: 85 },
-          { name: "Corn", score: 72 },
-          { name: "Soybeans", score: 65 },
-          { name: "Cotton", score: 40 }
-        ],
-        irrigation: {
-          type: "Drip Irrigation",
-          requirement: "Moderate",
-          frequency: "Every 3 days"
+    mutationFn: async (data: any) => {
+
+      const formData = new FormData();
+
+      formData.append("image", data.file);
+      formData.append("nitrogen", data.nValue);
+      formData.append("phosphorus", data.pValue);
+      formData.append("potassium", data.kValue);
+      formData.append("ph", data.phValue);
+      formData.append("location", data.location);
+
+      const response = await fetch(
+        "http://localhost:5000/api/soil/analyze",
+        {
+          method: "POST",
+          body: formData,
         }
+      );
+
+      if (!response.ok) {
+        throw new Error("Prediction failed");
+      }
+
+      const result = await response.json();
+
+      console.log("✅ BACKEND RESPONSE:", result);
+
+      // ✅ CONVERT PYTHON OUTPUT → FRONTEND FORMAT
+      return {
+        soilType: result.soilType,
+        crops: [
+          {
+            name: result.recommendedCrop,
+            score: 95,
+          },
+          ...(result.alternativeCrops || []).map((c: string) => ({
+            name: c,
+            score: 75,
+          })),
+        ],
       };
     },
+
     onSuccess: () => {
       toast({
         title: "Analysis Complete",
-        description: "Your soil report is ready to view.",
+        description: "Prediction successful",
       });
     },
+
     onError: () => {
       toast({
         variant: "destructive",
         title: "Analysis Failed",
-        description: "Could not process soil data. Please try again.",
+        description: "Check backend or Python logs",
       });
-    }
+    },
   });
 }
