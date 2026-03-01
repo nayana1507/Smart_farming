@@ -1,3 +1,4 @@
+
 import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
@@ -16,6 +17,10 @@ export async function registerRoutes(
   // ===============================
   app.use("/api/weather", weatherRoutes);
 
+  // ===============================
+  // SOIL + CROP ML ANALYSIS
+  // ===============================
+  app.use("/api/soil", soilCropRoutes);
 
   // ===============================
   // AUTH ROUTES
@@ -23,12 +28,15 @@ export async function registerRoutes(
 
   app.post(api.auth.login.path, async (req, res) => {
     try {
-      // 🔥 Using EMAIL (correct version)
-      const { email, password } = api.auth.login.input.parse(req.body);
+      const { email, password } =
+        api.auth.login.input.parse(req.body);
+
       const user = await storage.getUserByUsername(email);
 
       if (!user || user.password !== password) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({
+          message: "Invalid credentials",
+        });
       }
 
       return res.json({
@@ -36,19 +44,25 @@ export async function registerRoutes(
         email: user.email,
         name: user.name ?? "User",
       });
-
     } catch {
-      return res.status(400).json({ message: "Invalid input" });
+      return res.status(400).json({
+        message: "Invalid input",
+      });
     }
   });
 
   app.post(api.auth.register.path, async (req, res) => {
     try {
-      const input = api.auth.register.input.parse(req.body);
+      const input =
+        api.auth.register.input.parse(req.body);
 
-      const existing = await storage.getUserByUsername(input.email);
+      const existing =
+        await storage.getUserByUsername(input.email);
+
       if (existing) {
-        return res.status(400).json({ message: "User already exists" });
+        return res.status(400).json({
+          message: "User already exists",
+        });
       }
 
       const user = await storage.createUser({
@@ -62,37 +76,16 @@ export async function registerRoutes(
         email: user.email,
         name: user.name ?? "",
       });
-
     } catch {
-      return res.status(400).json({ message: "Registration failed" });
+      return res.status(400).json({
+        message: "Registration failed",
+      });
     }
   });
 
 
   // ===============================
-  // SOIL ANALYSIS (Mock)
-  // ===============================
 
-  app.post(api.soil.analyze.path, (req, res) => {
-    return res.json({
-      soilType: "Loamy Soil",
-      fertility: "High",
-      condition: "Optimal for most crops. Slightly acidic.",
-      crops: [
-        { name: "Wheat", score: 95 },
-        { name: "Corn", score: 88 },
-        { name: "Soybeans", score: 82 },
-      ],
-      irrigation: {
-        type: "Drip Irrigation",
-        requirement: "Medium",
-        frequency: "Every 2-3 days",
-      },
-    });
-  });
-
-
-  // ===============================
   // DISEASE DETECTION (Mock)
   // ===============================
   app.post(api.disease.detect.path, (_req, res) => {
@@ -110,18 +103,21 @@ export async function registerRoutes(
   app.get("/api/market/prices", async (_req, res) => {
     try {
       const data = await fetchMarketPrices();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch market prices" });
+
+  // ==============
+      return res.json(data);
+    } catch {
+      return res.status(500).json({
+        message: "Failed to fetch market prices",
+      });
     }
   });
 
-
   // ===============================
-  // SEED DEFAULT USER
+  // DEFAULT USERS (OPTIONAL SEED)
   // ===============================
-
-  const existingSeedUser = await storage.getUserByUsername("farmer@example.com");
+  const existingSeedUser =
+    await storage.getUserByUsername("farmer@example.com");
 
   if (!existingSeedUser) {
     await storage.createUser({
@@ -129,8 +125,17 @@ export async function registerRoutes(
       password: "password123",
       name: "John Doe",
     });
+  }
 
-    console.log("Seeded default user: farmer@example.com / password123");
+  const existingGuest =
+    await storage.getUserByUsername("guest@demo.com");
+
+  if (!existingGuest) {
+    await storage.createUser({
+      email: "guest@demo.com",
+      password: "password",
+      name: "Guest User",
+    });
   }
 
   return httpServer;
