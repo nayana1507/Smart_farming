@@ -145,7 +145,7 @@ export default function Login() {
           {/* Guest Login */}
           <Button
             variant="outline"
-            className="h-12 rounded-xl border-gray-200 hover:bg-gray-50"
+            className="w-full h-12 text-base rounded-xl border-gray-200 hover:bg-gray-50"
             onClick={() =>
               login.mutate({
                 email: "guest@demo.com",
