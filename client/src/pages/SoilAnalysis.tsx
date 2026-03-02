@@ -84,16 +84,23 @@ export default function SoilAnalysis() {
       formData.append("location", values.location || "Unknown");
 
       const response = await fetch(
-        "http://localhost:5000/api/soil/analyze",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+  "http://localhost:5000/api/soil/analyze",
+  {
+    method: "POST",
+    body: formData,
+  }
+);
 
-      const data = await response.json();
+const data = await response.json();
 
-      setResult(data);
+// ✅ HANDLE BACKEND ERROR
+if (!response.ok) {
+  alert(data.error || "Prediction failed");
+  setLoading(false);
+  return;
+}
+
+setResult(data);
 
     } catch (err) {
       console.error(err);
