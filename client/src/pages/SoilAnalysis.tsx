@@ -224,29 +224,51 @@ setResult(data);
         </Card>
 
         {/* ================= RESULT ================= */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Result</CardTitle>
-          </CardHeader>
+<Card>
+  <CardHeader>
+    <CardTitle>Result</CardTitle>
+  </CardHeader>
 
-          <CardContent>
+  <CardContent>
 
-            {!result ? (
-              <p>No analysis yet</p>
-            ) : (
-              <div className="space-y-3">
-                <p><b>Soil Type:</b> {result.soilType}</p>
-                <p><b>Recommended Crop:</b> {result.recommendedCrop}</p>
-                <p>
-                  <b>Alternatives:</b>{" "}
-                  {result.alternativeCrops?.join(", ")}
-                </p>
-              </div>
-            )}
+    {!result ? (
+      <p>No analysis yet</p>
+    ) : (
+      <div className="space-y-3">
 
-          </CardContent>
-        </Card>
+        <p>
+          <b>Soil Type:</b> {result.soilType}
+        </p>
 
+        <p>
+          <b>Recommended Crop:</b> {result.recommendedCrop}
+        </p>
+
+        <p>
+          <b>Alternative Crops:</b>{" "}
+          {result.alternativeCrops?.join(", ")}
+        </p>
+
+        {/* ✅ NEW IRRIGATION */}
+        <p>
+          <b>Irrigation Method:</b>{" "}
+          {result.irrigationMethod || "Not Available"}
+        </p>
+
+        {/* ✅ NEW FERTILIZER */}
+        <p>
+          <b>Fertilizer Recommendation:</b>{" "}
+          {result.fertilizerRecommendation || "Not Available"}
+        </p>
+
+        {/* ✅ DEBUG (REMOVE LATER) */}
+        {/* <pre>{JSON.stringify(result, null, 2)}</pre> */}
+
+      </div>
+    )}
+
+  </CardContent>
+</Card>
       </div>
     </Layout>
   );
