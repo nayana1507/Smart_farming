@@ -10,7 +10,6 @@ try:
 
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
     PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
-
     sys.path.append(PROJECT_ROOT)
 
     from soil.soil_predict import predict_soil_from_image
@@ -34,116 +33,164 @@ try:
     # ==============================
 
     soil_crop_map = {
-        "alluvial_soil": ["rice", "wheat", "sugarcane", "maize"],
-        "red_soil": ["groundnut", "millets", "cotton", "pulses"],
-        "laterite_soil": ["tea", "coffee", "cashew", "rubber"],
-        "mountain_soil": ["tea", "spices", "apple"],
-        "yellow_soil": ["maize", "groundnut", "pulses"]
+        "alluvial": ["rice","maize","banana","jute","papaya","watermelon","muskmelon"],
+        "yellow": ["maize","mango","orange","pigeonpeas","mungbean","lentil"],
+        "red": ["cotton","pigeonpeas","blackgram","mothbeans","chickpea"],
+        "mountain": ["apple","grapes","orange","coffee"],
+        "laterite": ["coconut","coffee","banana","mango"]
     }
 
     # ==============================
     # IRRIGATION + FERTILIZER DATA
     # ==============================
-
     CROP_RECOMMENDATIONS = {
 
-        "rice": {
-            "irrigation": "Flood irrigation or Alternate Wetting and Drying",
-            "fertilizer": "N:120-150 kg/ha, P:40-60 kg/ha, K:40-60 kg/ha"
-        },
+    "rice": {
+        "irrigation": "Flood irrigation or Alternate Wetting and Drying (AWD)",
+        "fertilizer": "High Nitrogen, moderate Phosphorus and Potassium"
+    },
 
-        "wheat": {
-            "irrigation": "Sprinkler irrigation",
-            "fertilizer": "N:90-120 kg/ha, P:40-50 kg/ha, K:30-40 kg/ha"
-        },
+    "maize": {
+        "irrigation": "Furrow or sprinkler irrigation",
+        "fertilizer": "Balanced NPK fertilizer"
+    },
 
-        "sugarcane": {
-            "irrigation": "Drip or Furrow irrigation",
-            "fertilizer": "N:150-180 kg/ha, P:60-80 kg/ha, K:100-120 kg/ha"
-        },
+    "chickpea": {
+        "irrigation": "Light irrigation, avoid waterlogging",
+        "fertilizer": "Low Nitrogen, high Phosphorus"
+    },
 
-        "maize": {
-            "irrigation": "Furrow or Sprinkler irrigation",
-            "fertilizer": "N:100-120 kg/ha, P:40-60 kg/ha, K:40-60 kg/ha"
-        },
+    "kidneybeans": {
+        "irrigation": "Sprinkler irrigation",
+        "fertilizer": "Moderate NPK fertilizer"
+    },
 
-        "groundnut": {
-            "irrigation": "Drip irrigation",
-            "fertilizer": "N:20-30 kg/ha, P:40-50 kg/ha, K:40-50 kg/ha"
-        },
+    "pigeonpeas": {
+        "irrigation": "Mostly rainfed, minimal irrigation",
+        "fertilizer": "Low Nitrogen, adequate Phosphorus"
+    },
 
-        "millets": {
-            "irrigation": "Rainfed or Light irrigation",
-            "fertilizer": "N:30-40 kg/ha, P:20-30 kg/ha, K:20-30 kg/ha"
-        },
+    "mothbeans": {
+        "irrigation": "Rainfed conditions preferred",
+        "fertilizer": "Low Nitrogen fertilizer"
+    },
 
-        "cotton": {
-            "irrigation": "Drip irrigation preferred",
-            "fertilizer": "N:60-80 kg/ha, P:30-40 kg/ha, K:40-60 kg/ha"
-        },
+    "mungbean": {
+        "irrigation": "Light irrigation at flowering stage",
+        "fertilizer": "Low Nitrogen, moderate Phosphorus"
+    },
 
-        "pulses": {
-            "irrigation": "Minimal irrigation",
-            "fertilizer": "N:20 kg/ha, P:40-50 kg/ha, K:20-30 kg/ha"
-        },
+    "blackgram": {
+        "irrigation": "Minimal irrigation",
+        "fertilizer": "Low Nitrogen fertilizer"
+    },
 
-        "tea": {
-            "irrigation": "Sprinkler irrigation",
-            "fertilizer": "N:50-60 kg/ha, P:30-40 kg/ha, K:40-50 kg/ha"
-        },
+    "lentil": {
+        "irrigation": "Light irrigation during flowering",
+        "fertilizer": "Phosphorus-rich fertilizer"
+    },
 
-        "coffee": {
-            "irrigation": "Drip irrigation",
-            "fertilizer": "N:60-80 kg/ha, P:40-60 kg/ha, K:80-100 kg/ha"
-        },
+    "pomegranate": {
+        "irrigation": "Drip irrigation recommended",
+        "fertilizer": "Organic manure + balanced NPK"
+    },
 
-        "cashew": {
-            "irrigation": "Drip irrigation",
-            "fertilizer": "N:25-35 kg/ha, P:20-30 kg/ha, K:40-50 kg/ha"
-        },
+    "banana": {
+        "irrigation": "Drip irrigation preferred",
+        "fertilizer": "High Potassium fertilizer"
+    },
 
-        "rubber": {
-            "irrigation": "Rainfed with supplemental irrigation",
-            "fertilizer": "NPK 12:12:12 annually"
-        },
+    "mango": {
+        "irrigation": "Drip irrigation during dry months",
+        "fertilizer": "Organic manure + NPK fertilizer"
+    },
 
-        "spices": {
-            "irrigation": "Drip irrigation",
-            "fertilizer": "Organic manure + balanced NPK"
-        },
+    "grapes": {
+        "irrigation": "Drip irrigation",
+        "fertilizer": "Balanced NPK + micronutrients"
+    },
 
-        "apple": {
-            "irrigation": "Drip irrigation",
-            "fertilizer": "N:70-100 kg/ha, P:35-50 kg/ha, K:70-100 kg/ha"
-        }
+    "watermelon": {
+        "irrigation": "Drip irrigation",
+        "fertilizer": "High Potassium fertilizer"
+    },
+
+    "muskmelon": {
+        "irrigation": "Drip irrigation",
+        "fertilizer": "Balanced NPK fertilizer"
+    },
+
+    "apple": {
+        "irrigation": "Drip irrigation",
+        "fertilizer": "Balanced NPK + organic compost"
+    },
+
+    "orange": {
+        "irrigation": "Drip irrigation",
+        "fertilizer": "Nitrogen and Potassium rich fertilizer"
+    },
+
+    "papaya": {
+        "irrigation": "Drip irrigation",
+        "fertilizer": "High Nitrogen fertilizer"
+    },
+
+    "coconut": {
+        "irrigation": "Basin irrigation or drip irrigation",
+        "fertilizer": "High Potassium fertilizer"
+    },
+
+    "cotton": {
+        "irrigation": "Drip irrigation preferred",
+        "fertilizer": "Nitrogen rich fertilizer"
+    },
+
+    "jute": {
+        "irrigation": "Flood irrigation",
+        "fertilizer": "Nitrogen and Phosphorus fertilizer"
+    },
+
+    "coffee": {
+        "irrigation": "Sprinkler or drip irrigation",
+        "fertilizer": "Compost + Nitrogen fertilizer"
     }
+}
 
     # ==============================
-    # SOIL PREDICTION
+    # SOIL PREDICTION (SAFE)
     # ==============================
 
-    soil_type = predict_soil_from_image(image_path).lower().strip()
+    soil_output = predict_soil_from_image(image_path)
 
+    if isinstance(soil_output, dict):
+        soil_type = soil_output.get("soilType", "")
+    else:
+        soil_type = str(soil_output)
+
+    soil_type = soil_type.lower().strip()
+
+    # Normalize names like "Red Soil" → "red"
+    if "alluvial" in soil_type:
+        soil_type = "alluvial"
+    elif "yellow" in soil_type:
+        soil_type = "yellow"
+    elif "red" in soil_type:
+        soil_type = "red"
+    elif "mountain" in soil_type:
+        soil_type = "mountain"
+    elif "laterite" in soil_type:
+        soil_type = "laterite"
     # ==============================
     # LOAD CROP MODEL
     # ==============================
 
     model = joblib.load(crop_model_path)
 
-    # Dummy climate values
     temperature = 25
     humidity = 60
     rainfall = 100
 
-    features = [[
-        N,
-        P,
-        K,
-        temperature,
-        humidity,
-        ph,
-        rainfall
-    ]]
+    features = [[N, P, K, temperature, humidity, ph, rainfall]]
 
     crop_prediction = model.predict(features)[0]
 
@@ -151,13 +198,16 @@ try:
     # FILTER BY SOIL SUITABILITY
     # ==============================
 
-    recommended = soil_crop_map.get(soil_type, [])
+    soil_based_crops = soil_crop_map.get(soil_type, []).copy()
 
-    if crop_prediction not in recommended:
-        recommended.insert(0, crop_prediction)
+    # Always include ML prediction
+    if crop_prediction in soil_based_crops:
+        soil_based_crops.remove(crop_prediction)
 
-    recommended_crop = recommended[0]
+    # Put ML prediction first
+    alternative_crops = [crop_prediction] + soil_based_crops
 
+    recommended_crop = crop_prediction
     # ==============================
     # GET IRRIGATION + FERTILIZER
     # ==============================
@@ -177,14 +227,13 @@ try:
     result = {
         "soilType": soil_type,
         "recommendedCrop": recommended_crop,
-        "alternativeCrops": recommended,
+        "alternativeCrops": alternative_crops,
         "irrigationMethod": crop_info["irrigation"],
         "fertilizerRecommendation": crop_info["fertilizer"],
         "location": location
     }
 
     print(json.dumps(result))
-
 
 # ==============================
 # ERROR HANDLING
