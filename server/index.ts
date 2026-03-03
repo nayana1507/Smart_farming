@@ -6,6 +6,7 @@ import cors from "cors";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import soilCropRoutes from "./routes/soilCrop.routes.js";
+import plantRoutes from "./routes/plant.routes";
 
 const app = express();
 const httpServer = createServer(app);
@@ -49,7 +50,7 @@ app.use((req, res, next) => {
 
 // ================= ✅ YOUR API ROUTES =================
 app.use("/api/soil", soilCropRoutes);
-
+app.use("/api/plant", plantRoutes);
 // ================= OTHER ROUTES =================
 (async () => {
 
