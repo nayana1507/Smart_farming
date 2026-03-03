@@ -2,7 +2,7 @@ import "dotenv/config";
 import express, { type Request, type Response, type NextFunction } from "express";
 import { createServer } from "http";
 import cors from "cors";
-
+import seasonRoutes from "./routes/season.routes";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import soilCropRoutes from "./routes/soilCrop.routes.js";
@@ -51,6 +51,7 @@ app.use((req, res, next) => {
 // ================= ✅ YOUR API ROUTES =================
 app.use("/api/soil", soilCropRoutes);
 app.use("/api/plant", plantRoutes);
+app.use("/api/seasonal-tips", seasonRoutes);
 // ================= OTHER ROUTES =================
 (async () => {
 
