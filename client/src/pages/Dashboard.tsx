@@ -10,6 +10,18 @@ import { useWeather } from "@/hooks/use-weather";
 export default function Dashboard() {
   const { user } = useAuth();
 
+  // 🌅 Dynamic Greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 12) return "Good Morning";
+    if (hour >= 12 && hour < 17) return "Good Afternoon";
+    if (hour >= 17 && hour < 21) return "Good Evening";
+    return "Good Night";
+  };
+
+  const greeting = getGreeting();
+
   // 🌍 Get user location
   const [coords, setCoords] = useState<{
     lat: number;
@@ -37,6 +49,19 @@ export default function Dashboard() {
     coords?.lat,
     coords?.lon
   );
+
+  // 🌾 Fetch Seasonal Tips
+  const [seasonData, setSeasonData] = useState<{
+    season: string;
+    tips: { title: string; content: string }[];
+  } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/seasonal-tips")
+      .then(res => res.json())
+      .then(data => setSeasonData(data))
+      .catch(err => console.error("Failed to load seasonal tips", err));
+  }, []);
 
   const features = [
     {
@@ -72,11 +97,11 @@ export default function Dashboard() {
           <div>
             <h1 className="text-3xl font-display font-bold text-gray-900">Dashboard</h1>
             <p className="text-muted-foreground mt-1">
-              Good morning, {user?.name || "Farmer"}. Here's what's happening today.
+              {greeting}, {user?.name ?? "Farmer"}. Here's what's happening today.
             </p>
           </div>
 
-          {/* 🌤 LIVE WEATHER SECTION */}
+          {/* 🌤 LIVE WEATHER */}
           <div className="flex items-center gap-3 bg-white p-3 pr-5 rounded-xl shadow-sm border border-border min-w-[240px]">
             <div className="p-2 bg-yellow-100 text-yellow-600 rounded-lg">
               <Sun className="w-5 h-5" />
@@ -145,7 +170,10 @@ export default function Dashboard() {
           ))}
         </div>
 
+        {/* Bottom Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* Recent Activity (static for now) */}
           <Card className="border-border/60 shadow-sm">
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
@@ -171,23 +199,31 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          {/* 🌾 Dynamic Seasonal Tips */}
           <Card className="bg-primary text-white border-none shadow-xl shadow-primary/20 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
-            {/* Field background */}
             <CardHeader className="relative">
-              <CardTitle className="text-white">Seasonal Tips</CardTitle>
+              <CardTitle className="text-white">
+                Seasonal Tips ({seasonData?.season ?? "Loading..."})
+              </CardTitle>
             </CardHeader>
+
             <CardContent className="relative space-y-4">
-              <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-                <h4 className="font-bold mb-1">Preparing for Harvest</h4>
-                <p className="text-emerald-50 text-sm">Monitor moisture levels closely this week. Optimal harvesting window for wheat is approaching in 3-5 days.</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-                <h4 className="font-bold mb-1">Pest Control</h4>
-                <p className="text-emerald-50 text-sm">Early signs of aphids detected in the region. Consider preventive neem oil spray.</p>
-              </div>
+              {!seasonData ? (
+                <p className="text-sm opacity-80">Loading seasonal tips...</p>
+              ) : (
+                seasonData.tips.map((tip, index) => (
+                  <div
+                    key={index}
+                    className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10"
+                  >
+                    <h4 className="font-bold mb-1">{tip.title}</h4>
+                    <p className="text-emerald-50 text-sm">{tip.content}</p>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
+
         </div>
       </div>
     </Layout>
