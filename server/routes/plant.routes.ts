@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { spawn } from "child_process";
+import { pool } from "../db";
 
 const router = express.Router();
 
@@ -19,13 +20,12 @@ const upload = multer({ storage });
 // =============================
 // PLANT DISEASE ROUTE
 // =============================
-router.post("/analyze", upload.single("image"), (req, res) => {
+router.post("/analyze", upload.single("image"), async (req: any, res) => {
 
   if (!req.file) {
     return res.status(400).json({ error: "No image uploaded" });
   }
 
-  // 🔥 THIS IS WHERE SPAWN IS CALLED
   const python = spawn("python", [
     "script/pipeline/plant_disease_pipeline.py",
     req.file.path,
@@ -42,13 +42,30 @@ router.post("/analyze", upload.single("image"), (req, res) => {
     errorOutput += data.toString();
   });
 
-  python.on("close", () => {
+  python.on("close", async () => {
     try {
       const jsonStart = output.indexOf("{");
       const jsonEnd = output.lastIndexOf("}");
       const jsonString = output.slice(jsonStart, jsonEnd + 1);
 
       const result = JSON.parse(jsonString);
+
+      // ✅ LOG ACTIVITY HERE
+      if (req.session?.userId) {
+        await pool.query(
+          `
+          INSERT INTO activity (user_id, type, title, description)
+          VALUES ($1, $2, $3, $4)
+          `,
+          [
+            req.session.userId,
+            "DISEASE_DETECTION",
+            "Disease Detection Performed",
+            `Detected disease: ${result.disease || "Unknown"}`
+          ]
+        );
+      }
+
       res.json(result);
 
     } catch (err) {

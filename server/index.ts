@@ -1,7 +1,10 @@
 import "dotenv/config";
 import express, { type Request, type Response, type NextFunction } from "express";
 import { createServer } from "http";
+import session from "express-session";
 import cors from "cors";
+
+import activityRoutes from "./routes/activity.routes";
 import seasonRoutes from "./routes/season.routes";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
@@ -11,53 +14,56 @@ import plantRoutes from "./routes/plant.routes";
 const app = express();
 const httpServer = createServer(app);
 
-// ================= MIDDLEWARE =================
-app.use(cors());
-
-app.use(express.json({
-  verify: (req: any, _res, buf) => {
-    req.rawBody = buf;
-  },
+// ================= CORS =================
+app.use(cors({
+  origin: true,
+  credentials: true,
 }));
 
+// ================= BODY PARSING =================
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ================= SESSION =================
+app.use(
+  session({
+    secret: "super-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // true only in production HTTPS
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
+  })
+);
+
 // ================= LOGGER =================
-export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-
-  console.log(`${formattedTime} [${source}] ${message}`);
-}
-
 app.use((req, res, next) => {
   const start = Date.now();
-  const path = req.path;
 
   res.on("finish", () => {
-    if (path.startsWith("/api")) {
+    if (req.path.startsWith("/api")) {
       const duration = Date.now() - start;
-      log(`${req.method} ${path} ${res.statusCode} in ${duration}ms`);
+      console.log(
+        `${req.method} ${req.path} ${res.statusCode} in ${duration}ms`
+      );
     }
   });
 
   next();
 });
 
-// ================= ✅ YOUR API ROUTES =================
+// ================= ROUTES =================
 app.use("/api/soil", soilCropRoutes);
 app.use("/api/plant", plantRoutes);
 app.use("/api/seasonal-tips", seasonRoutes);
-// ================= OTHER ROUTES =================
+app.use("/api/activity", activityRoutes);
+
 (async () => {
 
   await registerRoutes(httpServer, app);
 
-  // ERROR HANDLER
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     console.error("Internal Server Error:", err);
 
@@ -70,7 +76,6 @@ app.use("/api/seasonal-tips", seasonRoutes);
     });
   });
 
-  // ================= FRONTEND =================
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
   } else {
@@ -78,11 +83,10 @@ app.use("/api/seasonal-tips", seasonRoutes);
     await setupVite(httpServer, app);
   }
 
-  // ================= SERVER =================
   const port = parseInt(process.env.PORT || "5000", 10);
 
   httpServer.listen(port, () => {
-    log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at http://localhost:${port}`);
   });
 
 })();

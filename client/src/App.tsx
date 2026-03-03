@@ -1,6 +1,6 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,18 +13,46 @@ import SoilAnalysis from "@/pages/SoilAnalysis";
 import DiseaseDetection from "@/pages/DiseaseDetection";
 import MarketPrices from "@/pages/MarketPrices";
 
-/* ================= ROUTES ================= */
+/* ================= PROTECTED ROUTER ================= */
 
 function Router() {
+  const { user } = useAuth();
+
   return (
     <Switch>
-      <Route path="/" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/soil-analysis" component={SoilAnalysis} />
-      <Route path="/disease-detection" component={DiseaseDetection} />
-      <Route path="/market-prices" component={MarketPrices} />
+
+      {/* LOGIN PAGE */}
+      <Route path="/">
+        {user ? <Redirect to="/dashboard" /> : <Login />}
+      </Route>
+
+      {/* REGISTER PAGE */}
+      <Route path="/register">
+        {user ? <Redirect to="/dashboard" /> : <Register />}
+      </Route>
+
+      {/* DASHBOARD (Protected) */}
+      <Route path="/dashboard">
+        {user ? <Dashboard /> : <Redirect to="/" />}
+      </Route>
+
+      {/* SOIL ANALYSIS (Protected) */}
+      <Route path="/soil-analysis">
+        {user ? <SoilAnalysis /> : <Redirect to="/" />}
+      </Route>
+
+      {/* DISEASE DETECTION (Protected) */}
+      <Route path="/disease-detection">
+        {user ? <DiseaseDetection /> : <Redirect to="/" />}
+      </Route>
+
+      {/* MARKET PRICES (Protected) */}
+      <Route path="/market-prices">
+        {user ? <MarketPrices /> : <Redirect to="/" />}
+      </Route>
+
       <Route component={NotFound} />
+
     </Switch>
   );
 }

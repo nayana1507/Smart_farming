@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
@@ -21,8 +21,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const [, navigate] = useLocation();   // ✅ correct Wouter navigation
+  const [, navigate] = useLocation();
   const [user, setUser] = useState<User | null>(null);
+
+  // ✅ RESTORE SESSION ON PAGE LOAD
+  useEffect(() => {
+    fetch("/api/me", {
+      credentials: "include",
+    })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(userData => {
+        setUser(userData);
+      })
+      .catch(() => {
+        setUser(null);
+      });
+  }, []);
 
   /* ================= LOGIN ================= */
   const login = useMutation({
@@ -30,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // 🔥 REQUIRED
         body: JSON.stringify(credentials),
       });
 
@@ -44,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Welcome back!",
         description: `Logged in as ${userData.name}`,
       });
-      navigate("/dashboard");   // ✅
+      navigate("/dashboard");
     },
   });
 
@@ -54,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // 🔥 REQUIRED
         body: JSON.stringify(data),
       });
 
@@ -68,14 +87,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Account created!",
         description: `Welcome ${userData.name}`,
       });
-      navigate("/dashboard");   // ✅
+      navigate("/dashboard");
     },
   });
 
-  const logout = () => {
-    setUser(null);
-    navigate("/");   // ✅
-  };
+  const logout = async () => {
+  await fetch("/api/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+
+  setUser(null);
+
+  navigate("/", { replace: true }); 
+};
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout }}>

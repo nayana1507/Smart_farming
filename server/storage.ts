@@ -23,6 +23,14 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
+
+  async getUserById(id: number) {
+  return await db
+    .select()
+    .from(users)
+    .where(eq(users.id, id))
+    .then(res => res[0]);
+  }
 }
 
 export const storage = new DatabaseStorage();
