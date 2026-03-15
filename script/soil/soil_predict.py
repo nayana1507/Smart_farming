@@ -22,7 +22,6 @@ IMAGE_SIZE = (256, 256)
 # =====================================================
 # LOAD TRAINED MODELS (LOAD ONCE)
 # =====================================================
-print("Loading soil models...")
 
 stack = joblib.load(os.path.join(MODEL_DIR, "stack_model.pkl"))
 scaler = joblib.load(os.path.join(MODEL_DIR, "scaler.pkl"))
